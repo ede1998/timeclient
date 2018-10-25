@@ -119,9 +119,6 @@ public class Client
 
   public static long makePositive(byte b)
   {
-    if (b >= 0)
-      return b;
-   else
-     return 256 + b;
+    return (long) b & 0xFF;
   }
 }
