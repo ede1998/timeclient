@@ -1,5 +1,4 @@
 import java.net.*;
-import java.lang.Math;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
@@ -22,7 +21,7 @@ public class Client
       return;
     }
 
-    System.out.println("Created socket");
+    //System.out.println("Created socket");
    
 
     // get time
@@ -33,12 +32,12 @@ public class Client
     {
       if (!send(sock, ips))
         return;
-      System.out.println("Sent request to " + ip.toString());
+      //System.out.println("Sent request to " + ip.toString());
 
       answer = receive(sock);
       if (answer != null)
       {
-        System.out.println("Received answer");
+        //System.out.println("Received answer");
         break;
       }
     }
@@ -111,9 +110,9 @@ public class Client
 
     //int seconds = raw[3] + raw[2] << 8 + raw[1] << 8*2 + raw[0] << 8*3;
     //                               -33            121         -48           -38
-    System.out.println("time: " + makePositive(raw[0]) * 256  * 256  * 256  + ";" + makePositive(raw[1]) * 256  * 256  + ";" + makePositive(raw[2])  * 256 + ";" + makePositive(raw[3]));
+    //System.out.println("time: " + makePositive(raw[0]) * 256  * 256  * 256  + ";" + makePositive(raw[1]) * 256  * 256  + ";" + makePositive(raw[2])  * 256 + ";" + makePositive(raw[3]));
     long seconds = makePositive(raw[3]) + makePositive(raw[2]) * 256 + makePositive(raw[1]) * 256 * 256 + makePositive(raw[0]) * 256 * 256 * 256;
-    System.out.println("Seconds passed: " + seconds);
+    //System.out.println("Seconds passed: " + seconds);
     return ldt.plusSeconds(seconds);
   }
 
