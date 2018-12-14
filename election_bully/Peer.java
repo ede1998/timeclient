@@ -66,9 +66,8 @@ public class Peer {
 			e.printStackTrace();
 		}
 
-		// waitRandomTime
-		sleep(1000);
 		// start Bully algorithm
+		bully(ds);
 	}
 	static private ArrayList<PeerData> peers = new ArrayList<PeerData>();
 	
@@ -77,5 +76,80 @@ public class Peer {
 		try {
 			Thread.sleep(4000);
 		} catch (InterruptedException e) {}
+	}
+
+	public static void bully(DatagramSocket ds) {
+		// start listening
+		DatagramPacket dp = new DatagramPacket(new byte[2], 2);
+		Random r = new Random();
+		do
+		{
+			// wait for msg for random time
+			ds.setSoTimeOut(r.nextInt(1000));
+			try {
+			ds.receive(dp);
+			process(dp);
+			} catch (SocketTimeoutException ste) {}
+	        } while (r.nextInt(10) == 1);
+
+		System.out.println("Initiating bully alg");
+		sendElection(ds);
+
+		try {
+			ds.receive(dp);
+			process(dp, ds);
+		} catch (Exception e) {}
+
+	}
+
+	public static void process(DatagramPacket dp, DatagramSocket ds) {
+		final int pid = (int) ProcessHandle.current().pid();
+		int[] data = ByteBuffer.wrap(dp.getData()).asIntBuffer().array();
+		switch (data[0]) {
+			case 0: // Election
+				// send answer if pid > pid_sender
+				if (pid > data[1])
+					sendAnswer();
+				// start self elect
+				sendElection(ds);
+				break;
+			case 1: // Answer
+				break;
+			case 2: // coordinator
+				break;
+
+	}
+
+	public static void sendElection(DatagramSocket ds) {
+		try {
+		final int pid = (int) ProcessHandle.current().pid();
+		for (int i = 0; i < Peer.peers.size(); ++i) {
+			if (pid > Peer.peers.get(i).PID) continue;
+			int[] data = new int[2];
+			data[1] = pid;
+			data[0] = 0;
+			DatagramPacket dps = new DatagramPacket(data, 4);
+			ds.send(dps);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	public static void sendAnswer(DatagramSocket ds) {
+
+	}
+	public static void sendCoordinator(DatagramSocket ds) {
+		try {
+		final int pid = (int) ProcessHandle.current().pid();
+		for (int i = 0; i < Peer.peers.size(); ++i) {
+			int[] data = new int[2];
+			data[1] = pid;
+			data[0] = 2;
+			DatagramPacket dps = new DatagramPacket(data, 4);
+			ds.send(dps);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
